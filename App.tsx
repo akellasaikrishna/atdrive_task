@@ -57,7 +57,12 @@ export default class App extends React.Component<any, state> {
       >
         <ScrollView>
           <Fragment>
-            <View>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+              }}
+            >
               <Calendar
                 current={new Date()}
                 markedDates={markedObject}
@@ -91,7 +96,7 @@ export default class App extends React.Component<any, state> {
                 placeholderTextColor="gray"
                 style={{
                   backgroundColor: "#EEE",
-                  height: dimensions.height / 3,
+                  height: dimensions.height / 4,
                   width: dimensions.width / 1.15,
                   borderRadius: 15,
                   padding: 15,
