@@ -13,11 +13,16 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.test.calender",
+      "adaptiveIcon": {
+        "backgroundColor": "#205cbe",
+        "foregroundImage": "./assets/icon.png"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
