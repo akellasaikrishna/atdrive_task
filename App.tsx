@@ -7,22 +7,34 @@ import {
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
+  AsyncStorage,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 interface state {
   items: any;
   selectedDate: string;
+  markedDates: any;
 }
 
-let selectedDate: any;
 const dimensions = Dimensions.get("screen");
 export default class App extends React.Component<any, state> {
   constructor(props: any) {
     super(props);
     this.state = {
       items: {},
-      selectedDate: "",
+      selectedDate: `${new Date().getUTCFullYear()}-${
+        new Date().getUTCMonth().toString().length == 1 ? "0" : ""
+      }${new Date().getUTCMonth()}-${new Date().getUTCDate()}`,
+      markedDates: {},
     };
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem("items").then((data) => {
+      if (data != null) {
+        this.setState({ items: JSON.parse(data) });
+      }
+    });
   }
   render() {
     return (
@@ -34,15 +46,11 @@ export default class App extends React.Component<any, state> {
           <View>
             <Calendar
               current={new Date()}
+              markedDates={this.state.markedDates}
               onDayPress={(day) => {
-                this.setState({ selectedDate: day["dateString"] });
-              }}
-              onDayLongPress={(day) => {
-                console.log("selected day", day);
-              }}
-              onMonthChange={(month) => {
-                console.log("month changed", month);
-                // this.setState({ notes: "" });
+                this.setState({
+                  selectedDate: day["dateString"],
+                });
               }}
             />
           </View>
@@ -65,6 +73,8 @@ export default class App extends React.Component<any, state> {
               Notes
             </Text>
             <TextInput
+              placeholder="Type your notes here"
+              placeholderTextColor="gray"
               style={{
                 backgroundColor: "#EEE",
                 height: dimensions.height / 3,
@@ -75,8 +85,9 @@ export default class App extends React.Component<any, state> {
                 fontSize: 17,
               }}
               value={
-                this.state.items[this.state.selectedDate] &&
-                this.state.items[this.state.selectedDate]
+                (this.state.items &&
+                  this.state.items[this.state.selectedDate]) ||
+                ""
               }
               onChangeText={(text) => {
                 if (!this.state.items[this.state.selectedDate]) {
@@ -84,7 +95,12 @@ export default class App extends React.Component<any, state> {
                 } else {
                   this.state.items[this.state.selectedDate] = text;
                 }
-                this.setState({ items: this.state.items });
+                this.setState({ items: this.state.items }, () => {
+                  AsyncStorage.setItem(
+                    "items",
+                    JSON.stringify(this.state.items)
+                  );
+                });
               }}
             />
           </View>
