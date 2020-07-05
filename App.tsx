@@ -3,15 +3,12 @@ import {
   StyleSheet,
   View,
   Dimensions,
-  TouchableOpacity,
   Text,
-  Alert,
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
-  ToastAndroid,
 } from "react-native";
-import { Calendar, CalendarList, Agenda } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 interface state {
   items: any;
   selectedDate: string;
