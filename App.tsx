@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import {
   StyleSheet,
   View,
@@ -32,78 +32,98 @@ export default class App extends React.Component<any, state> {
   componentDidMount() {
     AsyncStorage.getItem("items").then((data) => {
       if (data != null) {
-        this.setState({ items: JSON.parse(data) });
+        this.setState({ items: JSON.parse(data) }, () => {
+          Object.keys(this.state.items).map((date) => {
+            this.state.markedDates[date] = {
+              marked: true,
+            };
+          });
+          this.setState({ markedDates: this.state.markedDates });
+        });
       }
     });
   }
   render() {
+    let markedObject = {};
+    Object.keys(this.state.items).map((date) => {
+      markedObject[date] = {
+        marked: true,
+      };
+    });
     return (
       <KeyboardAvoidingView
         style={{ flex: 1, marginTop: 35 }}
         behavior="height"
       >
         <ScrollView>
-          <View>
-            <Calendar
-              current={new Date()}
-              markedDates={this.state.markedDates}
-              onDayPress={(day) => {
-                this.setState({
-                  selectedDate: day["dateString"],
-                });
-              }}
-            />
-          </View>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#FFFFFF",
-              flex: 1,
-            }}
-          >
-            <Text
+          <Fragment>
+            <View>
+              <Calendar
+                current={new Date()}
+                markedDates={markedObject}
+                onDayPress={(day) => {
+                  this.setState({
+                    selectedDate: day["dateString"],
+                  });
+                }}
+              />
+            </View>
+            <View
               style={{
-                paddingVertical: 10,
-                fontSize: 17,
-                textAlign: "center",
-                fontWeight: "bold",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#FFFFFF",
+                flex: 1,
               }}
             >
-              Notes
-            </Text>
-            <TextInput
-              placeholder="Type your notes here"
-              placeholderTextColor="gray"
-              style={{
-                backgroundColor: "#EEE",
-                height: dimensions.height / 3,
-                width: dimensions.width / 1.15,
-                borderRadius: 15,
-                padding: 15,
-                textAlignVertical: "top",
-                fontSize: 17,
-              }}
-              value={
-                (this.state.items &&
-                  this.state.items[this.state.selectedDate]) ||
-                ""
-              }
-              onChangeText={(text) => {
-                if (!this.state.items[this.state.selectedDate]) {
-                  this.state.items[this.state.selectedDate] = text;
-                } else {
-                  this.state.items[this.state.selectedDate] = text;
+              <Text
+                style={{
+                  paddingVertical: 10,
+                  fontSize: 17,
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                Notes
+              </Text>
+              <TextInput
+                placeholder="Type your notes here"
+                placeholderTextColor="gray"
+                style={{
+                  backgroundColor: "#EEE",
+                  height: dimensions.height / 3,
+                  width: dimensions.width / 1.15,
+                  borderRadius: 15,
+                  padding: 15,
+                  textAlignVertical: "top",
+                  fontSize: 17,
+                }}
+                value={
+                  (this.state.items &&
+                    this.state.items[this.state.selectedDate]) ||
+                  ""
                 }
-                this.setState({ items: this.state.items }, () => {
-                  AsyncStorage.setItem(
-                    "items",
-                    JSON.stringify(this.state.items)
-                  );
-                });
-              }}
-            />
-          </View>
+                onChangeText={(text) => {
+                  if (!this.state.items[this.state.selectedDate]) {
+                    this.state.items[this.state.selectedDate] = text;
+                  } else {
+                    this.state.items[this.state.selectedDate] = text;
+                  }
+                  this.setState({ items: this.state.items }, () => {
+                    Object.keys(this.state.items).map((date) => {
+                      markedObject[date] = {
+                        marked: true,
+                      };
+                    });
+                    AsyncStorage.setItem(
+                      "items",
+                      JSON.stringify(this.state.items)
+                    );
+                  });
+                }}
+              />
+            </View>
+          </Fragment>
         </ScrollView>
       </KeyboardAvoidingView>
     );
